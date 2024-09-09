@@ -8,11 +8,13 @@ struct User: Identifiable {
 
     // MARK: - Init
     init(user: UserListResponse.User) {
+        //Simplify
         self.name = .init(title: user.name.title, first: user.name.first, last: user.name.last)
         self.dob = .init(date: user.dob.date, age: user.dob.age)
         self.picture = .init(large: user.picture.large, medium: user.picture.medium, thumbnail: user.picture.thumbnail)
     }
 
+//Repetitive in UserListResponse
     // MARK: - Dob
     struct Dob: Codable {
         let date: String

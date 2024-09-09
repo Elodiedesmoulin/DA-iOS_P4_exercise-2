@@ -8,7 +8,8 @@ struct UserListResponse: Codable {
         let name: Name
         let dob: Dob
         let picture: Picture
-
+        
+//Repetitive in User
         // MARK: - Dob
         struct Dob: Codable {
             let date: String
