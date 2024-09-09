@@ -7,19 +7,14 @@
 
 import SwiftUI
 
-struct UserListViewModel: View {
-    // TODO: - Those properties should be viewModel's OutPuts
-    @State private var users: [User] = []
-    @State private var isLoading = false
-    @State private var isGridView = false
+class UserListViewModel: ObservableObject {
+    @Published var users: [User] = []
+    @Published var isLoading = false
+    @Published var isGridView = false
 
-    // TODO: - The property should be declared in the viewModel
     private let repository = UserListRepository()
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
     
-    private func fetchUsers() {
+    func fetchUsers() {
         isLoading = true
         Task {
             do {
@@ -29,15 +24,24 @@ struct UserListViewModel: View {
             } catch {
                 print("Error fetching users: \(error.localizedDescription)")
             }
+            
+            /*
+             ????
+             DispatchQueue.main.async {
+             self.users.append(contentsOf: users)
+             self.isLoading = false
+         }
+     } catch {
+         print("Error fetching users: \(error.localizedDescription)")
+     }
+             */
+            
         }
     }
     
-    private func reloadUsers() {
+    
+    func reloadUsers() {
         users.removeAll()
         fetchUsers()
     }
-}
-
-#Preview {
-    UserListViewModel()
 }
