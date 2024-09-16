@@ -1,20 +1,20 @@
 import Foundation
 
-struct UserListRepository {
-
+struct UserListRepository: UserListRepositoryProtocol {
+    
     private let executeDataRequest: (URLRequest) async throws -> (Data, URLResponse)
-
+    
     init(
         executeDataRequest: @escaping (URLRequest) async throws -> (Data, URLResponse) = URLSession.shared.data(for:)
     ) {
         self.executeDataRequest = executeDataRequest
     }
-
+    
     func fetchUsers(quantity: Int) async throws -> [User] {
         guard let url = URL(string: "https://randomuser.me/api/") else {
             throw URLError(.badURL)
         }
-
+        
         let request = try URLRequest(
             url: url,
             method: .GET,
@@ -22,11 +22,15 @@ struct UserListRepository {
                 "results": quantity
             ]
         )
-
+        
         let (data, _) = try await executeDataRequest(request)
-
+        
         let response = try JSONDecoder().decode(UserListResponse.self, from: data)
         
         return response.results.map(User.init)
     }
+}
+
+protocol UserListRepositoryProtocol {
+    func fetchUsers(quantity: Int) async throws -> [User]
 }

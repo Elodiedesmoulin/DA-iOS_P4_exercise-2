@@ -11,8 +11,14 @@ class UserListViewModel: ObservableObject {
     @Published var users: [User] = []
     @Published var isLoading = false
     @Published var isGridView = false
-
-    private let repository = UserListRepository()
+    
+    
+    private let repository: UserListRepositoryProtocol
+    
+    init(repository: UserListRepositoryProtocol = UserListRepository()) {
+        self.repository = repository
+    }
+    
     
     func fetchUsers() {
         isLoading = true

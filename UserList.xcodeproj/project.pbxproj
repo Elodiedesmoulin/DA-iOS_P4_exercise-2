@@ -26,6 +26,7 @@
 		F61B4E2C2C98C113009CF9E6 /* Dob.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E2B2C98C113009CF9E6 /* Dob.swift */; };
 		F61B4E2F2C98C13C009CF9E6 /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E2E2C98C13C009CF9E6 /* Name.swift */; };
 		F61B4E312C98C15A009CF9E6 /* Picture.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E302C98C15A009CF9E6 /* Picture.swift */; };
+		F61B4E352C98C68B009CF9E6 /* UserListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		F61B4E2B2C98C113009CF9E6 /* Dob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dob.swift; sourceTree = "<group>"; };
 		F61B4E2E2C98C13C009CF9E6 /* Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Name.swift; sourceTree = "<group>"; };
 		F61B4E302C98C15A009CF9E6 /* Picture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Picture.swift; sourceTree = "<group>"; };
+		F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				2F015BA72ACC938F009A098C /* UserListRepositoryTests.swift */,
+				F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */,
 				2FB4823B2ACC98DD0016CBA7 /* UserList.xctestplan */,
 			);
 			path = UserListTests;
@@ -297,6 +300,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2F015BA82ACC938F009A098C /* UserListRepositoryTests.swift in Sources */,
+				F61B4E352C98C68B009CF9E6 /* UserListViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

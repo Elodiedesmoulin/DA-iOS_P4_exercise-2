@@ -7,8 +7,8 @@ struct User: Identifiable {
     let picture: Picture
     
     init(from userResponse: UserListResponse.User) {
-            self.name = userResponse.name
-            self.dob = userResponse.dob
-            self.picture = userResponse.picture
-        }
+        self.name = userResponse.name
+        self.dob = userResponse.dob
+        self.picture = userResponse.picture
+    }
 }

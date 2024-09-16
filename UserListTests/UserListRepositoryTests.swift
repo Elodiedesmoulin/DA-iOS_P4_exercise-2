@@ -34,7 +34,7 @@ final class UserListRepositoryTests: XCTestCase {
             httpVersion: nil,
             headerFields: nil
         )!
-
+        
         let mockExecuteDataRequest: (URLRequest) async throws -> (Data, URLResponse) = { _ in
             return (invalidJSONData, invalidJSONResponse)
         }
