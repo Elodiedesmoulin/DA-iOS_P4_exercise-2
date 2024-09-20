@@ -27,6 +27,7 @@
 		F61B4E2F2C98C13C009CF9E6 /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E2E2C98C13C009CF9E6 /* Name.swift */; };
 		F61B4E312C98C15A009CF9E6 /* Picture.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E302C98C15A009CF9E6 /* Picture.swift */; };
 		F61B4E352C98C68B009CF9E6 /* UserListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */; };
+		F61B4E3D2C997A21009CF9E6 /* MockUserListRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E3C2C997A21009CF9E6 /* MockUserListRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		F61B4E2E2C98C13C009CF9E6 /* Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Name.swift; sourceTree = "<group>"; };
 		F61B4E302C98C15A009CF9E6 /* Picture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Picture.swift; sourceTree = "<group>"; };
 		F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewModelTests.swift; sourceTree = "<group>"; };
+		F61B4E3C2C997A21009CF9E6 /* MockUserListRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUserListRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,7 +91,7 @@
 				2FFB64272AC6D255007F2F80 /* UserListApp.swift */,
 				F61B4DF62C8ED7ED009CF9E6 /* Views */,
 				F61B4E2D2C98C121009CF9E6 /* Models */,
-				F61B4DF42C8ED634009CF9E6 /* UserListViewModel.swift */,
+				F61B4E3E2C9986CC009CF9E6 /* ViewModel */,
 				2FF9D91E2ACB3DD400F3A6C5 /* UserListRepository.swift */,
 				2FF9D9192ACB3CD800F3A6C5 /* HTTPClient */,
 			);
@@ -144,6 +146,7 @@
 		2FFB64372AC6D256007F2F80 /* UserListTests */ = {
 			isa = PBXGroup;
 			children = (
+				F61B4E3C2C997A21009CF9E6 /* MockUserListRepository.swift */,
 				2F015BA72ACC938F009A098C /* UserListRepositoryTests.swift */,
 				F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */,
 				2FB4823B2ACC98DD0016CBA7 /* UserList.xctestplan */,
@@ -174,6 +177,14 @@
 				2FEF0C6E2ACB416C004DB87C /* UserListResponse.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		F61B4E3E2C9986CC009CF9E6 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F61B4DF42C8ED634009CF9E6 /* UserListViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -299,6 +310,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F61B4E3D2C997A21009CF9E6 /* MockUserListRepository.swift in Sources */,
 				2F015BA82ACC938F009A098C /* UserListRepositoryTests.swift in Sources */,
 				F61B4E352C98C68B009CF9E6 /* UserListViewModelTests.swift in Sources */,
 			);

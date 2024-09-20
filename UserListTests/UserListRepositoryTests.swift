@@ -66,7 +66,7 @@ private extension UserListRepositoryTests {
                             "last": "Doe"
                         },
                         "dob": {
-                            "date": "1990-01-01",
+                            "date": "1990-01-01T00:00:00.000Z",
                             "age": 31
                         },
                         "picture": {
@@ -82,7 +82,7 @@ private extension UserListRepositoryTests {
                             "last": "Smith"
                         },
                         "dob": {
-                            "date": "1995-02-15",
+                            "date": "1995-02-15T00:00:00.000Z",
                             "age": 26
                         },
                         "picture": {

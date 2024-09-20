@@ -6,8 +6,7 @@
 //
 
 import Foundation
-import Foundation
 
-struct Name: Codable {
+struct Name: Codable, Equatable {
     let title, first, last: String
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Dob: Codable {
+struct Dob: Codable, Equatable {
     let date: Date
     let age: Int
     
@@ -18,6 +18,7 @@ struct Dob: Codable {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         
         guard let parsedDate = dateFormatter.date(from: isoDate) else {
             throw DecodingError.dataCorruptedError(forKey: .date, in: container, debugDescription: "Le format de la date est invalide.")
@@ -27,12 +28,16 @@ struct Dob: Codable {
         self.age = try container.decode(Int.self, forKey: .age)
     }
     
-    func formattedDate() -> String {
-        
-        let dateFormatter2 = DateFormatter()
-        dateFormatter2.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFormatter2.string(from: date)
-        return dateString
-    }
+    //For tests
+    init(date: Date, age: Int) {
+            self.date = date
+            self.age = age
+        }
     
+    func formattedDate() -> String {
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateStyle = .medium
+        displayFormatter.timeStyle = .none
+        return displayFormatter.string(from: date)
+    }
 }

@@ -22,3 +22,5 @@ struct UserDetailView: View {
         .navigationTitle("\(user.name.first) \(user.name.last)")
     }
 }
+
+

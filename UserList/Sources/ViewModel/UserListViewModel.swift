@@ -11,6 +11,7 @@ class UserListViewModel: ObservableObject {
     @Published var users: [User] = []
     @Published var isLoading = false
     @Published var isGridView = false
+    @Published var selectedUser: User?
     
     
     private let repository: UserListRepositoryProtocol
@@ -44,4 +45,8 @@ class UserListViewModel: ObservableObject {
         users.removeAll()
         fetchUsers()
     }
+    
+    func selectUser(_ user: User) {
+            self.selectedUser = user
+        }
 }
