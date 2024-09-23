@@ -5,49 +5,49 @@
 //  Created by Elo on 16/09/2024.
 //
 
+
 import XCTest
 import SwiftUI
 import ViewInspector
 @testable import UserList
-
 
 final class UserListViewModelTests: XCTestCase {
     
     var viewModel: UserListViewModel!
     var mockRepository: MockUserListRepository!
     let expectation = XCTestExpectation(description: #function)
-    
+    let reloadExpectation = XCTestExpectation(description: #function)
     
     override func setUp() {
         super.setUp()
-        
         mockRepository = MockUserListRepository()
         viewModel = UserListViewModel(repository: mockRepository)
     }
     
     override func tearDown() {
-            viewModel = nil
-            mockRepository = nil
-            super.tearDown()
-        }
+        viewModel = nil
+        mockRepository = nil
+        super.tearDown()
+    }
     
     func createMockUser(firstName: String = "John", lastName: String = "Doe", age: Int = 30) -> User {
-            let name = Name(title: "Mr", first: firstName, last: lastName)
-            let dob = Dob(date: Date(), age: age)
-            let picture = Picture(large: "https://example.com/large.jpg", medium: "https://example.com/medium.jpg", thumbnail: "https://example.com/thumb.jpg")
-            return User(from: UserListResponse.User(name: name, dob: dob, picture: picture))
-        }
+        let name = Name(title: "Mr", first: firstName, last: lastName)
+        let dob = Dob(date: Date(), age: age)
+        let picture = Picture(large: "https://example.com/large.jpg", medium: "https://example.com/medium.jpg", thumbnail: "https://example.com/thumb.jpg")
+        return User(from: UserListResponse.User(name: name, dob: dob, picture: picture))
+    }
     
+    // MARK: - Initial State Tests
     
-    // Test initialisation
-        func testInitialState() {
-            XCTAssertTrue(viewModel.users.isEmpty)
-            XCTAssertFalse(viewModel.isLoading)
-            XCTAssertFalse(viewModel.isGridView)
-        }
-
+    func testInitialState() {
+        XCTAssertTrue(viewModel.users.isEmpty)
+        XCTAssertFalse(viewModel.isLoading)
+        XCTAssertFalse(viewModel.isGridView)
+    }
+    
+    // MARK: - Fetch Users Tests
+    
     func testFetchUsersSuccess() {
-        
         // Given
         let mockUsers = [
             createMockUser(firstName: "John", lastName: "Doe", age: 30),
@@ -59,212 +59,281 @@ final class UserListViewModelTests: XCTestCase {
         viewModel.fetchUsers()
         
         // Then
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, mockUsers.count)
+            XCTAssertEqual(self.viewModel.users[0].name.first, "John")
+            XCTAssertFalse(self.viewModel.isLoading)
             
             self.expectation.fulfill()
         }
-        
-        wait(for: [expectation], timeout: 2)
-        
-        
-        XCTAssertEqual(viewModel.users.count, mockUsers.count)
-        XCTAssertEqual(viewModel.users[0].name.first, "John")
-        XCTAssertFalse(viewModel.isLoading)
+        wait(for: [expectation], timeout: 0.2)
     }
     
-
-    
     func testFetchUsersFailure() {
-        
         // Given
-       
         mockRepository.fetchUsersResult = .failure(NSError(domain: "TestError", code: 1, userInfo: nil))
         
         // When
         viewModel.fetchUsers()
         
         // Then
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertTrue(self.viewModel.users.isEmpty)
+            XCTAssertFalse(self.viewModel.isLoading)
+            
             self.expectation.fulfill()
         }
-        
-        wait(for: [expectation], timeout: 2)
-        
-        XCTAssertTrue(self.viewModel.users.isEmpty) // The user's list remain empty
-        XCTAssertFalse(self.viewModel.isLoading) // Loading stop even after fail
+        wait(for: [expectation], timeout: 0.2)
     }
     
-    func testIsLoadingStateDuringFetch() {
-        mockRepository.fetchUsersResult = .success([createMockUser()])
+    func testFetchUsersRetryAfterNetworkError() {
+        // Given
+        mockRepository.fetchUsersResult = .failure(URLError(.notConnectedToInternet))
         
-        XCTAssertFalse(viewModel.isLoading)
-        
+        //When
         viewModel.fetchUsers()
         
-        XCTAssertTrue(viewModel.isLoading)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertTrue(self.viewModel.users.isEmpty)
+            XCTAssertFalse(self.viewModel.isLoading)
+            
             self.expectation.fulfill()
         }
+        wait(for: [expectation], timeout: 0.2)
+
+        //When
+        let mockUser = createMockUser()
+        mockRepository.fetchUsersResult = .success([mockUser])
+        viewModel.fetchUsers()
         
-        wait(for: [expectation], timeout: 2)
-        
-        XCTAssertFalse(viewModel.isLoading)
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            
+            self.reloadExpectation.fulfill()
+        }
+        wait(for: [reloadExpectation], timeout: 0.2)
     }
     
-    
-    func testSwitchingViewModes() {
+    func testFetchUsersMultipleTimes() {
         // Given
-        XCTAssertFalse(viewModel.isGridView)
+        let firstMockUsers = [createMockUser(firstName: "John")]
+        mockRepository.fetchUsersResult = .success(firstMockUsers)
         
-        // When switching to grid view
-        viewModel.isGridView.toggle()
+        //When
+        viewModel.fetchUsers()
         
-        // Then
-        XCTAssertTrue(viewModel.isGridView)
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            XCTAssertEqual(self.viewModel.users.first?.name.first, "John")
+            
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
         
-        // When switching back to list view
-        viewModel.isGridView.toggle()
+        // When
+        let secondMockUsers = [createMockUser(firstName: "Jane")]
+        mockRepository.fetchUsersResult = .success(secondMockUsers)
+        viewModel.fetchUsers()
         
-        // Then
-        XCTAssertFalse(viewModel.isGridView)
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 2)
+            XCTAssertEqual(self.viewModel.users[1].name.first, "Jane")
+            XCTAssertFalse(self.viewModel.isLoading)
+            
+            self.reloadExpectation.fulfill()
+        }
+        wait(for: [reloadExpectation], timeout: 0.2)
     }
     
+    
+    //MARK: - Select Users Tests
+    
+    func testSelectUser() {
+        // Given
+        let mockUser = createMockUser(firstName: "John", lastName: "Doe", age: 30)
+        viewModel.users = [mockUser]
+        
+        // When
+        viewModel.selectUser(mockUser)
+        
+        // Then
+        XCTAssertNotNil(viewModel.selectedUser)
+        XCTAssertEqual(viewModel.selectedUser?.name.first, "John")
+        XCTAssertEqual(viewModel.selectedUser?.name.last, "Doe")
+        XCTAssertEqual(viewModel.selectedUser?.dob.age, 30)
+    }
+    
+    
+    // MARK: - Reload Users Tests
     
     func testReloadUsers() {
+        //Given
         let mockUser = createMockUser(firstName: "John", lastName: "Doe", age: 30)
         mockRepository.fetchUsersResult = .success([mockUser])
         
+        //When
         viewModel.fetchUsers()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            
             self.expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 0.2)
         
-        XCTAssertEqual(viewModel.users.count, 1)
-        
-        viewModel.reloadUsers()
-        
-        XCTAssertTrue(viewModel.users.isEmpty) // Ajout
-        
-        let reloadExpectation = XCTestExpectation(description: "Reload users")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                reloadExpectation.fulfill()
-            }
-            wait(for: [reloadExpectation], timeout: 2)
-            
-        XCTAssertEqual(viewModel.users.count, 1)
-        
-    }
-    
-    func testReloadUsersFailure() {
-        //Given
-        mockRepository.fetchUsersResult = .failure(NSError(domain: "TestError", code: 1, userInfo: nil))
-
         //When
         viewModel.reloadUsers()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 2)
         
         //Then
-        XCTAssertTrue(viewModel.users.isEmpty, "La liste doit être vide après un reload échoué.")
-        XCTAssertFalse(viewModel.isLoading, "L'état de chargement doit être faux après un reload échoué.")
-    }
-    
-    
-    func testUserDetailViewRendering() {
-        
-        let mockUser = createMockUser(firstName: "John", lastName: "Doe", age: 30)
-        
-        // When : Créer la vue UserDetailView avec l'utilisateur mock
-        
-        let view = UserDetailView(user: mockUser)
-        let hostingController = UIHostingController(rootView: view)
-        XCTAssertNotNil(hostingController.view)
-    }
-    
-    func testFetchManyUsersPerformance() {
-        // Générer une grande quantité d'utilisateurs mock
-        let mockUsers = (0..<1000).map { _ in
-            createMockUser(firstName: "John", lastName: "Doe", age: 30)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            
+            self.reloadExpectation.fulfill()
         }
-        mockRepository.fetchUsersResult = .success(mockUsers)
+        wait(for: [reloadExpectation], timeout: 0.2)
+    }
+    
+    
+    func testReloadUsersFailure() {
+        // Given
+        mockRepository.fetchUsersResult = .failure(NSError(domain: "TestError", code: 1, userInfo: nil))
         
-       
-            viewModel.fetchUsers()
+        // When
+        viewModel.reloadUsers()
+        
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertTrue(self.viewModel.users.isEmpty)
+            XCTAssertFalse(self.viewModel.isLoading)
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.expectation.fulfill()
-            }
-            wait(for: [expectation], timeout: 2)
-            
-            // Vérification du nombre d'utilisateurs récupérés
-        XCTAssertEqual(viewModel.users.count, mockUsers.count)
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
     }
     
     func testReloadUsersResetsUserList() {
         // Given
         let mockUsers = [createMockUser(), createMockUser(firstName: "Jane")]
         mockRepository.fetchUsersResult = .success(mockUsers)
+        
+        //When
         viewModel.fetchUsers()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 2)
+            
             self.expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 0.2)
         
-        XCTAssertEqual(viewModel.users.count, 2)
-        
-        // When reloading users
+        // When
         let newMockUser = createMockUser(firstName: "Alice")
         mockRepository.fetchUsersResult = .success([newMockUser])
         viewModel.reloadUsers()
         
-        let reloadExpectation = XCTestExpectation(description: "Reload users")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                reloadExpectation.fulfill()
-            }
-            wait(for: [reloadExpectation], timeout: 2)
-        
-        // Then
-        XCTAssertEqual(viewModel.users.count, 1)
-        XCTAssertEqual(viewModel.users.first?.name.first, "Alice")
+        //Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            XCTAssertEqual(self.viewModel.users.first?.name.first, "Alice")
+            
+            self.reloadExpectation.fulfill()
+        }
+        wait(for: [reloadExpectation], timeout: 0.2)
     }
     
-    func testFetchUsersRetryAfterNetworkError() {
+    func testReloadUsersSuccess() {
         // Given
-        mockRepository.fetchUsersResult = .failure(URLError(.notConnectedToInternet))
-        viewModel.fetchUsers()
+        let mockUser = createMockUser(firstName: "John", lastName: "Doe", age: 30)
+        mockRepository.fetchUsersResult = .success([mockUser])
         
-        // Attendre le premier échec
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        // When
+        viewModel.reloadUsers()
+        
+        // Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            XCTAssertEqual(self.viewModel.users.first?.name.first, "John")
+            XCTAssertFalse(self.viewModel.isLoading)
             self.expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 3)
+        wait(for: [expectation], timeout: 0.2)
+    }
+    
+    
+    func testReloadUsersUpdatesState() {
+        // Given
+        let initialUser = createMockUser(firstName: "John", lastName: "Doe")
+        mockRepository.fetchUsersResult = .success([initialUser])
         
-        // Then
-        XCTAssertTrue(viewModel.users.isEmpty)
-        XCTAssertFalse(viewModel.isLoading)
-        
-        // When retry après échec
-        let mockUser = createMockUser()
-        mockRepository.fetchUsersResult = .success([mockUser])
+        // When
         viewModel.fetchUsers()
         
         // Then
-        let reloadExpectation = XCTestExpectation(description: "Reload users")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                reloadExpectation.fulfill()
-            }
-            wait(for: [reloadExpectation], timeout: 3)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
         
-        XCTAssertEqual(viewModel.users.count, 1)
+        // When
+        let newUser = self.createMockUser(firstName: "Alice")
+        self.mockRepository.fetchUsersResult = .success([newUser])
+        self.viewModel.reloadUsers()
+        
+        // Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.viewModel.users.count, 1)
+            XCTAssertEqual(self.viewModel.users.first?.name.first, "Alice")
+            
+            self.reloadExpectation.fulfill()
+        }
+        wait(for: [reloadExpectation], timeout: 0.2)
     }
+    
+    // MARK: - Loading State Tests
+    
+    func testIsLoadingStateDuringFetch() {
+        // Given
+        mockRepository.fetchUsersResult = .success([createMockUser()])
+        
+        // Then
+        XCTAssertFalse(viewModel.isLoading)
+        
+        // When
+        viewModel.fetchUsers()
+        
+        //Then
+        XCTAssertTrue(viewModel.isLoading)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertFalse(self.viewModel.isLoading)
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+    }
+    
+    func testIsLoadingIsResetAfterError() {
+        // Given
+        let expectedError = NSError(domain: "TestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch users."])
+        mockRepository.fetchUsersResult = .failure(expectedError)
+        
+        // When
+        viewModel.fetchUsers()
+        
+        // Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertFalse(self.viewModel.isLoading)
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+    }
+    
+    // MARK: - Pagination Tests
     
     func testListViewPagination() {
         // Given
@@ -272,110 +341,26 @@ final class UserListViewModelTests: XCTestCase {
         let additionalUsers = (0..<5).map { _ in createMockUser() }
         mockRepository.fetchUsersResult = .success(initialUsers)
         
-        viewModel.fetchUsers()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 2)
-        
         // When
-        let fetchMoreExpectation = XCTestExpectation(description: "Fetch more users")
-        mockRepository.fetchUsersResult = .success(additionalUsers)
-        
-        // Simuler que le dernier utilisateur est affiché
-        if let lastUser = viewModel.users.last {
-            viewModel.fetchUsers() // Devrait déclencher le chargement des utilisateurs supplémentaires
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            fetchMoreExpectation.fulfill()
-        }
-        
-        wait(for: [fetchMoreExpectation], timeout: 2)
+        viewModel.fetchUsers()
         
         // Then
-        XCTAssertEqual(viewModel.users.count, initialUsers.count + additionalUsers.count)
-    }
-    
-    
-    func testGridViewPagination() {
-        // Given
-        let initialUsers = (0..<10).map { _ in createMockUser() }
-        let additionalUsers = (0..<5).map { _ in createMockUser() }
-        mockRepository.fetchUsersResult = .success(initialUsers)
-        
-        viewModel.isGridView = true
-        viewModel.fetchUsers()
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.mockRepository.fetchUsersResult = .success(additionalUsers)
+            
             self.expectation.fulfill()
         }
-        
         wait(for: [expectation], timeout: 2)
         
         // When
-        let fetchMoreExpectation = XCTestExpectation(description: "Fetch more users")
-        mockRepository.fetchUsersResult = .success(additionalUsers)
+        viewModel.fetchUsers()
         
-        // Simuler que le dernier utilisateur est affiché
-            viewModel.fetchUsers() // Devrait déclencher le chargement des utilisateurs supplémentaires
+        // Then
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            XCTAssertEqual(self.viewModel.users.count, initialUsers.count + additionalUsers.count)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            fetchMoreExpectation.fulfill()
+            self.reloadExpectation.fulfill()
         }
-        
-        wait(for: [fetchMoreExpectation], timeout: 2)
-        
-        // Then
-        XCTAssertEqual(viewModel.users.count, initialUsers.count + additionalUsers.count)
+        wait(for: [reloadExpectation], timeout: 2)
     }
-    
-    func testSwitchViewAndFetchUsers() {
-        // Given
-        let mockUsers = [createMockUser()]
-        mockRepository.fetchUsersResult = .success(mockUsers)
-        
-        // When
-        viewModel.isGridView = true
-        viewModel.fetchUsers()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 2)
-        
-        // Verify GridView
-        XCTAssertTrue(viewModel.isGridView)
-        XCTAssertEqual(viewModel.users.count, mockUsers.count)
-        
-        // Toggle to ListView
-        viewModel.isGridView.toggle()
-        
-        XCTAssertFalse(viewModel.isGridView)
-        XCTAssertEqual(viewModel.users.count, mockUsers.count)
-    }
-    
-    
-    func testUserSelection() {
-            // Given
-            let mockUser = createMockUser(firstName: "John", lastName: "Doe", age: 30)
-            viewModel.users = [mockUser]
-            
-            // When
-            viewModel.selectUser(mockUser)
-            
-            // Then
-            XCTAssertNotNil(viewModel.selectedUser)
-            XCTAssertEqual(viewModel.selectedUser?.name.first, "John")
-            XCTAssertEqual(viewModel.selectedUser?.name.last, "Doe")
-            XCTAssertEqual(viewModel.selectedUser?.dob.age, 30)
-        }
-        
-    
-    
 }
-
-

@@ -6,7 +6,11 @@ struct UserListView: View {
     var body: some View {
         NavigationView {
             Group {
-                if !viewModel.isGridView {
+                if let error = viewModel.error {
+                    ErrorView(error: error, retryAction: {
+                        viewModel.fetchUsers()
+                    })
+                } else if !viewModel.isGridView {
                     ListView(users: viewModel.users, loadMore: shouldLoadMoreData, fetchUsers: viewModel.fetchUsers)
                 } else {
                     GridView(users: viewModel.users, loadMore: shouldLoadMoreData, fetchUsers: viewModel.fetchUsers)
@@ -37,6 +41,16 @@ struct UserListView: View {
         }
         .onAppear {
             viewModel.fetchUsers()
+        }
+    
+        .alert(isPresented: .constant(viewModel.error != nil && viewModel.error?.errorDescription == "An unexpected error occurred")) {
+            Alert(
+                title: Text("Error"),
+                message: Text(viewModel.error?.localizedDescription ?? "Unknown error"),
+                dismissButton: .default(Text("OK")) {
+                    viewModel.error = nil
+                }
+            )
         }
     }
     

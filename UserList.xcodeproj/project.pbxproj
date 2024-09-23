@@ -28,6 +28,8 @@
 		F61B4E312C98C15A009CF9E6 /* Picture.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E302C98C15A009CF9E6 /* Picture.swift */; };
 		F61B4E352C98C68B009CF9E6 /* UserListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */; };
 		F61B4E3D2C997A21009CF9E6 /* MockUserListRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61B4E3C2C997A21009CF9E6 /* MockUserListRepository.swift */; };
+		F690A8942CA1625F002BA1B5 /* Errorview.swift in Sources */ = {isa = PBXBuildFile; fileRef = F690A8932CA1625F002BA1B5 /* Errorview.swift */; };
+		F690A8962CA1629A002BA1B5 /* UserListError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F690A8952CA1629A002BA1B5 /* UserListError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +67,8 @@
 		F61B4E302C98C15A009CF9E6 /* Picture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Picture.swift; sourceTree = "<group>"; };
 		F61B4E342C98C68B009CF9E6 /* UserListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewModelTests.swift; sourceTree = "<group>"; };
 		F61B4E3C2C997A21009CF9E6 /* MockUserListRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUserListRepository.swift; sourceTree = "<group>"; };
+		F690A8932CA1625F002BA1B5 /* Errorview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errorview.swift; sourceTree = "<group>"; };
+		F690A8952CA1629A002BA1B5 /* UserListError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +167,7 @@
 				F61B4DFD2C8EDAC0009CF9E6 /* GridView.swift */,
 				F61B4DF92C8EDA2A009CF9E6 /* UserRowView.swift */,
 				F61B4DFB2C8EDA56009CF9E6 /* AsyncImageView.swift */,
+				F690A8932CA1625F002BA1B5 /* Errorview.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -173,6 +178,7 @@
 				2FEF0C702ACB45E3004DB87C /* User.swift */,
 				F61B4E2B2C98C113009CF9E6 /* Dob.swift */,
 				F61B4E2E2C98C13C009CF9E6 /* Name.swift */,
+				F690A8952CA1629A002BA1B5 /* UserListError.swift */,
 				F61B4E302C98C15A009CF9E6 /* Picture.swift */,
 				2FEF0C6E2ACB416C004DB87C /* UserListResponse.swift */,
 			);
@@ -290,11 +296,13 @@
 				2FF9D91D2ACB3D8800F3A6C5 /* HTTPMethod.swift in Sources */,
 				2FF9D91B2ACB3CE600F3A6C5 /* URLRequest.swift in Sources */,
 				F61B4DF82C8EDA06009CF9E6 /* ListView.swift in Sources */,
+				F690A8962CA1629A002BA1B5 /* UserListError.swift in Sources */,
 				F61B4DFE2C8EDAC0009CF9E6 /* GridView.swift in Sources */,
 				F61B4E312C98C15A009CF9E6 /* Picture.swift in Sources */,
 				2FFB642A2AC6D255007F2F80 /* UserListView.swift in Sources */,
 				2FEF0C6F2ACB416C004DB87C /* UserListResponse.swift in Sources */,
 				F61B4DF52C8ED634009CF9E6 /* UserListViewModel.swift in Sources */,
+				F690A8942CA1625F002BA1B5 /* Errorview.swift in Sources */,
 				2F804AE22ACC976300A46A03 /* UserDetailView.swift in Sources */,
 				F61B4E2F2C98C13C009CF9E6 /* Name.swift in Sources */,
 				2FF9D91F2ACB3DD400F3A6C5 /* UserListRepository.swift in Sources */,
