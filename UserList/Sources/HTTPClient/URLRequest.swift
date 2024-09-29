@@ -10,11 +10,11 @@ extension URLRequest {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             throw URLError(.badURL)
         }
-
+        
         self.init(url: url)
-
+        
         httpMethod = method.rawValue
-
+        
         if let parameters = parameters {
             switch method {
             case .GET:
@@ -23,14 +23,14 @@ extension URLRequest {
                 try encodeParametersInBody(parameters)
             }
         }
-
+        
         if let headers = headers {
             for (key, value) in headers {
                 setValue(value, forHTTPHeaderField: key)
             }
         }
     }
-
+    
     private mutating func encodeParametersInURL(
         _ parameters: [String: Any],
         components: URLComponents
@@ -41,7 +41,7 @@ extension URLRequest {
             .map { URLQueryItem(name: $0, value: $1) }
         url = components.url
     }
-
+    
     private mutating func encodeParametersInBody(
         _ parameters: [String: Any]
     ) throws {
