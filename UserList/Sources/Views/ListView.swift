@@ -13,12 +13,12 @@ struct ListView: View {
     let fetchUsers: () -> Void
     
     var body: some View {
-        List(users) { user in
-            NavigationLink(destination: UserDetailView(user: user)) {
-                UserRowView(user: user)
+        List(users.indices, id: \.self) { index in
+            NavigationLink(destination: UserDetailView(user: users[index])) {
+                UserRowView(user: users[index])
             }
             .onAppear {
-                if loadMore(user) {
+                if index == users.count - 1 {
                     fetchUsers()
                 }
             }

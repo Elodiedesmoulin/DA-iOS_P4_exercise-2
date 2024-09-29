@@ -42,7 +42,7 @@ struct UserListView: View {
         .onAppear {
             viewModel.fetchUsers()
         }
-    
+        
         .alert(isPresented: .constant(viewModel.error != nil && viewModel.error?.errorDescription == "An unexpected error occurred")) {
             Alert(
                 title: Text("Error"),

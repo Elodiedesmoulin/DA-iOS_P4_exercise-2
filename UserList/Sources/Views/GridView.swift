@@ -13,27 +13,29 @@ struct GridView: View {
     let fetchUsers: () -> Void
     
     let columns = [GridItem(.adaptive(minimum: 150))]
+    @State private var isFetching = false
     
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns) {
-                ForEach(users) { user in
-                    NavigationLink(destination: UserDetailView(user: user)) {
+                ForEach(users.indices, id: \.self) { index in
+                    NavigationLink(destination: UserDetailView(user: users[index])) {
                         VStack {
-                            AsyncImageView(url: URL(string: user.picture.medium), size: 150)
-                            
-                            Text("\(user.name.first) \(user.name.last)")
+                            AsyncImageView(url: URL(string: users[index].picture.medium), size: 150)
+                            Text("\(users[index].name.first) \(users[index].name.last)")
                                 .font(.headline)
                                 .multilineTextAlignment(.center)
                         }
                     }
                     .onAppear {
-                        if loadMore(user) {
+                        if index == users.count - 1 {
                             fetchUsers()
                         }
                     }
                 }
             }
         }
+        
     }
 }
+

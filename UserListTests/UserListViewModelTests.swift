@@ -34,7 +34,7 @@ final class UserListViewModelTests: XCTestCase {
         let name = Name(title: "Mr", first: firstName, last: lastName)
         let dob = Dob(date: Date(), age: age)
         let picture = Picture(large: "https://example.com/large.jpg", medium: "https://example.com/medium.jpg", thumbnail: "https://example.com/thumb.jpg")
-        return User(from: UserListResponse.User(name: name, dob: dob, picture: picture))
+        return User(name: name, dob: dob, picture: picture)
     }
     
     // MARK: - Initial State Tests
@@ -60,13 +60,13 @@ final class UserListViewModelTests: XCTestCase {
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, mockUsers.count)
-            XCTAssertEqual(self.viewModel.users[0].name.first, "John")
-            XCTAssertFalse(self.viewModel.isLoading)
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, mockUsers.count)
+        XCTAssertEqual(self.viewModel.users[0].name.first, "John")
+        XCTAssertFalse(self.viewModel.isLoading)
     }
     
     func testFetchUsersFailure() {
@@ -78,12 +78,12 @@ final class UserListViewModelTests: XCTestCase {
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertTrue(self.viewModel.users.isEmpty)
-            XCTAssertFalse(self.viewModel.isLoading)
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertTrue(self.viewModel.users.isEmpty)
+        XCTAssertFalse(self.viewModel.isLoading)
     }
     
     func testFetchUsersRetryAfterNetworkError() {
@@ -95,13 +95,13 @@ final class UserListViewModelTests: XCTestCase {
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertTrue(self.viewModel.users.isEmpty)
-            XCTAssertFalse(self.viewModel.isLoading)
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
-
+        
+        XCTAssertTrue(self.viewModel.users.isEmpty)
+        XCTAssertFalse(self.viewModel.isLoading)
+        
         //When
         let mockUser = createMockUser()
         mockRepository.fetchUsersResult = .success([mockUser])
@@ -109,11 +109,11 @@ final class UserListViewModelTests: XCTestCase {
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
-            
             self.reloadExpectation.fulfill()
         }
         wait(for: [reloadExpectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 1)
     }
     
     func testFetchUsersMultipleTimes() {
@@ -126,27 +126,27 @@ final class UserListViewModelTests: XCTestCase {
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
-            XCTAssertEqual(self.viewModel.users.first?.name.first, "John")
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
         
+        XCTAssertEqual(self.viewModel.users.count, 1)
+        XCTAssertEqual(self.viewModel.users.first?.name.first, "John")
+        
         // When
-        let secondMockUsers = [createMockUser(firstName: "Jane")]
-        mockRepository.fetchUsersResult = .success(secondMockUsers)
+        let secondMockUser = createMockUser(firstName: "Jane")
+        mockRepository.fetchUsersResult = .success([secondMockUser])
         viewModel.fetchUsers()
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 2)
-            XCTAssertEqual(self.viewModel.users[1].name.first, "Jane")
-            XCTAssertFalse(self.viewModel.isLoading)
-            
             self.reloadExpectation.fulfill()
         }
         wait(for: [reloadExpectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 2)
+        XCTAssertEqual(self.viewModel.users.last, secondMockUser)
+        XCTAssertFalse(self.viewModel.isLoading)
     }
     
     
@@ -180,22 +180,22 @@ final class UserListViewModelTests: XCTestCase {
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 1)
         
         //When
         viewModel.reloadUsers()
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
-            
             self.reloadExpectation.fulfill()
         }
         wait(for: [reloadExpectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 1)
     }
     
     
@@ -208,12 +208,12 @@ final class UserListViewModelTests: XCTestCase {
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertTrue(self.viewModel.users.isEmpty)
-            XCTAssertFalse(self.viewModel.isLoading)
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertTrue(self.viewModel.users.isEmpty)
+        XCTAssertFalse(self.viewModel.isLoading)
     }
     
     func testReloadUsersResetsUserList() {
@@ -226,11 +226,11 @@ final class UserListViewModelTests: XCTestCase {
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 2)
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 2)
         
         // When
         let newMockUser = createMockUser(firstName: "Alice")
@@ -239,12 +239,12 @@ final class UserListViewModelTests: XCTestCase {
         
         //Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
-            XCTAssertEqual(self.viewModel.users.first?.name.first, "Alice")
-            
             self.reloadExpectation.fulfill()
         }
         wait(for: [reloadExpectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 1)
+        XCTAssertEqual(self.viewModel.users.first?.name.first, "Alice")
     }
     
     func testReloadUsersSuccess() {
@@ -257,12 +257,13 @@ final class UserListViewModelTests: XCTestCase {
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
-            XCTAssertEqual(self.viewModel.users.first?.name.first, "John")
-            XCTAssertFalse(self.viewModel.isLoading)
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 1)
+        XCTAssertEqual(self.viewModel.users.first?.name.first, "John")
+        XCTAssertFalse(self.viewModel.isLoading)
     }
     
     
@@ -276,10 +277,11 @@ final class UserListViewModelTests: XCTestCase {
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 1)
         
         // When
         let newUser = self.createMockUser(firstName: "Alice")
@@ -288,12 +290,12 @@ final class UserListViewModelTests: XCTestCase {
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.users.count, 1)
-            XCTAssertEqual(self.viewModel.users.first?.name.first, "Alice")
-            
             self.reloadExpectation.fulfill()
         }
         wait(for: [reloadExpectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.users.count, 1)
+        XCTAssertEqual(self.viewModel.users.first?.name.first, "Alice")
     }
     
     // MARK: - Loading State Tests
@@ -311,10 +313,11 @@ final class UserListViewModelTests: XCTestCase {
         //Then
         XCTAssertTrue(viewModel.isLoading)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertFalse(self.viewModel.isLoading)
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertFalse(self.viewModel.isLoading)
     }
     
     func testIsLoadingIsResetAfterError() {
@@ -327,10 +330,11 @@ final class UserListViewModelTests: XCTestCase {
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertFalse(self.viewModel.isLoading)
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertFalse(self.viewModel.isLoading)
     }
     
     // MARK: - Pagination Tests
@@ -346,21 +350,103 @@ final class UserListViewModelTests: XCTestCase {
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.mockRepository.fetchUsersResult = .success(additionalUsers)
-            
             self.expectation.fulfill()
         }
         wait(for: [expectation], timeout: 2)
+        
+        self.mockRepository.fetchUsersResult = .success(additionalUsers)
         
         // When
         viewModel.fetchUsers()
         
         // Then
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            XCTAssertEqual(self.viewModel.users.count, initialUsers.count + additionalUsers.count)
-
             self.reloadExpectation.fulfill()
         }
         wait(for: [reloadExpectation], timeout: 2)
+        
+        XCTAssertEqual(self.viewModel.users.count, initialUsers.count + additionalUsers.count)
+    }
+    
+    
+    // MARK: - Error Tests
+    
+    func testNetworkErrorNotConnectedToInternet() {
+        let error = URLError(.notConnectedToInternet)
+        mockRepository.fetchUsersResult = .failure(error)
+        viewModel.fetchUsers()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.error, UserListError.networkError(error))
+    }
+    
+    func testNetworkErrorTimedOut() {
+        let error = URLError(.timedOut)
+        mockRepository.fetchUsersResult = .failure(error)
+        viewModel.fetchUsers()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.error, UserListError.networkError(error))
+    }
+    
+    func testNetworkErrorCannotConnectToHost() {
+        let error = URLError(.cannotConnectToHost)
+        mockRepository.fetchUsersResult = .failure(error)
+        viewModel.fetchUsers()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.error, UserListError.networkError(error))
+    }
+    
+    func testNetworkErrorConnectionLost() {
+        let error = URLError(.networkConnectionLost)
+        mockRepository.fetchUsersResult = .failure(error)
+        viewModel.fetchUsers()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.error, UserListError.networkError(error))
+    }
+    
+    func testUnexpectedError() {
+        let error = NSError(domain: "Test Error", code: 1, userInfo: [NSLocalizedDescriptionKey: "An error occured" ])
+        mockRepository.fetchUsersResult = .failure(error)
+        viewModel.fetchUsers()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.error, UserListError.unexpectedError("An error occured"))
+    }
+    
+    func testNetworkErrorUnknown() {
+        let error = URLError(.unknown)
+        mockRepository.fetchUsersResult = .failure(error)
+        viewModel.fetchUsers()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0.2)
+        
+        XCTAssertEqual(self.viewModel.error, UserListError.networkError(error))
     }
 }
+

@@ -13,7 +13,7 @@ class UserListViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var isGridView = false
     @Published var selectedUser: User?
-    @Published var error: UserListError?  // Pour gérer les messages d'erreur
+    @Published var error: UserListError?
     
     private let repository: UserListRepositoryProtocol
     
@@ -24,12 +24,15 @@ class UserListViewModel: ObservableObject {
     func fetchUsers() {
         isLoading = true
         error = nil
+        
         Task {
             do {
-                let users = try await repository.fetchUsers(quantity: 20)
+                let newUsers = try await repository.fetchUsers(quantity: 20)
                 
                 DispatchQueue.main.async {
-                    self.users.append(contentsOf: users)
+                    // Éviter les doublons avant d'ajouter les nouveaux utilisateurs
+                    let uniqueUsers = newUsers.filter { !self.users.contains($0) }
+                    self.users.append(contentsOf: uniqueUsers)
                     self.isLoading = false
                 }
             } catch let urlError as URLError {
@@ -50,6 +53,7 @@ class UserListViewModel: ObservableObject {
         users.removeAll()
         fetchUsers()
     }
+    
     
     func selectUser(_ user: User) {
         self.selectedUser = user

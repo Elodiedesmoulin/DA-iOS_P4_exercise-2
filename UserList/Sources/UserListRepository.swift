@@ -27,7 +27,7 @@ struct UserListRepository: UserListRepositoryProtocol {
         
         let response = try JSONDecoder().decode(UserListResponse.self, from: data)
         
-        return response.results.map(User.init)
+        return response.results
     }
 }
 

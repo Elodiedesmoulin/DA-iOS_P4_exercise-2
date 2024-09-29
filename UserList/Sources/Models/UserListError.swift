@@ -9,15 +9,13 @@ import SwiftUI
 
 enum UserListError: Error, LocalizedError, Equatable{
     case networkError(URLError)
-    case parsingError
     case unexpectedError(String)
     
     var errorDescription: String? {
         switch self {
         case .networkError(let urlError):
             return mapURLError(urlError)
-        case .parsingError:
-            return "Failed to parse the user data."
+
         case .unexpectedError(let message):
             return message
         }

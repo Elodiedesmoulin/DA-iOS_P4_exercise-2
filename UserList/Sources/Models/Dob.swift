@@ -30,9 +30,9 @@ struct Dob: Codable, Equatable {
     
     //For tests
     init(date: Date, age: Int) {
-            self.date = date
-            self.age = age
-        }
+        self.date = date
+        self.age = age
+    }
     
     func formattedDate() -> String {
         let displayFormatter = DateFormatter()

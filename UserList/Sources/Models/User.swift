@@ -1,14 +1,8 @@
 import Foundation
 
 struct User: Identifiable, Codable, Equatable {
-    var id = UUID()
+    var id: UUID { UUID() }
     let name: Name
     let dob: Dob
     let picture: Picture
-    
-    init(from userResponse: UserListResponse.User) {
-        self.name = userResponse.name
-        self.dob = userResponse.dob
-        self.picture = userResponse.picture
-    }
 }
